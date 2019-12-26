@@ -14,8 +14,8 @@ services:
       - --entryPoints.https.address=:443
       - --certificatesResolvers.le.acme.email=bastien.lalos@gmail.com
       - --certificatesResolvers.le.acme.storage=acme.json
-      - --certificatesResolvers.le.acme.httpChallenge.entryPoint=web
-      - --certificatesResolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # To debug LE
+      - --certificatesResolvers.le.acme.httpChallenge.entryPoint=http
+     # - --certificatesResolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # To debug LE
     networks:
       - proxy
     volumes:
@@ -24,8 +24,6 @@ services:
       - "80:80"
       - "443:443"
       - "8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     deploy:
       mode: global
       placement:
@@ -38,11 +36,4 @@ networks:
   proxy:
     driver: overlay
     external: true
-
-volumes:
-  cert:
-    driver: local
-    driver_opts:
-      type: bind
-      device: /home/blalos/volumes/cert
     

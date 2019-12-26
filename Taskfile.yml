@@ -1,0 +1,28 @@
+version: '2'
+
+vars:
+  TRAEFIK_VERSION: "v1" # 'v1' or 'v2'
+
+tasks:
+  default:
+    cmds:
+      - task: down
+      - task: up
+      - task: deploy
+    silent: true
+  
+  down:
+    cmds:
+      - docker stack rm proxy hello
+    silent: true
+
+  up:
+    cmds:
+      - docker network create -d overlay --attachable=true proxy
+      - docker stack deploy -c traefik-{{.TRAEFIK_VERSION}}/traefik.yml proxy
+    silent: true
+
+  deploy:
+    cmds:
+      - docker stack deploy -c traefik-{{.TRAEFIK_VERSION}}/hello.yml hello
+    silent: true

@@ -1,0 +1,26 @@
+version: "3.6"
+
+services:
+  helloworld:
+    image: tutum/hello-world:latest
+    ports:
+      - 80
+    networks:
+      - proxy
+    deploy:
+      labels:
+        # Tells Traefik to expose the service.
+        - "traefik.enable=true"
+        # Tells Traefik to redirect all traffic coming with host `helloworld.local` to this service.
+        - "traefik.http.routers.helloworld.rule=Host(`helloworld.local`)"
+        # Tells Traefik this service will be exposed using the `http` & `https` entrypoint
+        - "traefik.http.routers.helloworld.entrypoints=http,https"
+        # Tells Traefik the service expose the port 80 internally. This is needed by Traefik to act as a proxy
+        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+        # Tells Traefik the service use tls / ssl
+        - "traefik.http.routers.helloworld.tls=true"
+        # Tells Traefik the certificates resolver for automatic cert generation & installation
+        - "traefik.http.routers.helloworld.tls.certresolver=le"
+networks:
+  proxy:
+    external: true

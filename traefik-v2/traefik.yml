@@ -1,0 +1,39 @@
+version: "3.6"
+
+services:
+  traefik:
+    image: traefik:2.1
+    command:
+      - --api.insecure=true
+      - --log.level=DEBUG
+      - --providers.docker=true
+      - --providers.docker.network=proxy
+      - --providers.docker.swarmmode=true
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.http.address=:80
+      - --entryPoints.https.address=:443
+      - --certificatesResolvers.le.acme.email=bastien.lalos@gmail.com
+      - --certificatesResolvers.le.acme.storage=acme.json
+      - --certificatesResolvers.le.acme.httpChallenge.entryPoint=http
+     # - --certificatesResolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # To debug LE
+    networks:
+      - proxy
+    volumes:
+      - cert:/etc/traefik/acme
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+networks:
+  proxy:
+    driver: overlay
+    external: true
+    

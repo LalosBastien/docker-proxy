@@ -1,0 +1,25 @@
+version: "3.6"
+
+services:
+  helloworld:
+    image: tutum/hello-world
+    ports:
+      - 80
+    networks:
+      - proxy
+    deploy:
+      labels:
+        # Tells Traefik to expose the service.
+        - "traefik.enable=true"
+        # Tells Traefik to redirect all traffic coming with host `helloworld.local` to this service.
+        - "traefik.frontend.rule=Host:helloworld.local"
+        # Indicate to Traefik that the service expose the port 80 internally. This is needed by Traefik to act as a proxy
+        - "traefik.port=80"
+        # Tells Traefik that this service will be exposed using the `http` & `https` entrypoint
+        - "traefik.frontend.entryPoints=http,https"
+        # Tells Traefik to use the `Weighted Round Robin` load balancing strategy
+        - "traefik.backend.loadbalancer.method=wrr"
+
+networks:
+  proxy:
+    external: true

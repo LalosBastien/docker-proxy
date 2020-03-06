@@ -5,17 +5,18 @@ services:
     image: traefik:2.1
     command:
       - --api.insecure=true
-      - --log.level=DEBUG
       - --providers.docker=true
       - --providers.docker.network=proxy
       - --providers.docker.swarmmode=true
       - --providers.docker.exposedbydefault=false
       - --entryPoints.http.address=:80
       - --entryPoints.https.address=:443
+      # Auto renew LE certificates
       - --certificatesResolvers.le.acme.email=bastien.lalos@gmail.com
       - --certificatesResolvers.le.acme.storage=acme.json
       - --certificatesResolvers.le.acme.httpChallenge.entryPoint=http
      # - --certificatesResolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # To debug LE
+     # - --log.level=DEBUG
     networks:
       - proxy
     volumes:

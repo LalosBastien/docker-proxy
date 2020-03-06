@@ -11,16 +11,28 @@ services:
       labels:
         # Tells Traefik to expose the service.
         - "traefik.enable=true"
-        # Tells Traefik to redirect all traffic coming with host `helloworld.local` to this service.
-        - "traefik.http.routers.helloworld.rule=Host(`helloworld.local`)"
-        # Tells Traefik this service will be exposed using the `http` & `https` entrypoint
-        - "traefik.http.routers.helloworld.entrypoints=http,https"
-        # Tells Traefik the service expose the port 80 internally. This is needed by Traefik to act as a proxy
-        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+        # Middleware Redirection
+        - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+        # Middleware BasicAuth
+        - "traefik.http.middlewares.auth.basicauth.users=user:$$apr1$$sJ2anGSD$$YBDmPdvhmZNKs.xoZNyeO/"
+
+        # Tells Traefik to redirect all HTTP traffic coming with host `helloworld.local` to this service.
+        - "traefik.http.routers.helloworld.rule=Host(`hello.local`)"
+        # Tells Traefik this service will be exposed using the `http` entrypoint
+        - "traefik.http.routers.helloworld.entrypoints=http"
+        
+        # Tells Traefik to redirect all HTTPS traffic coming with host `helloworld.local` to this service.
+        - "traefik.http.routers.helloworld-sec.rule=Host(`hello.local`)"
+        # Tells Traefik this service will be exposed using the `https` entrypoint
+        - "traefik.http.routers.helloworld-sec.entrypoints=https"
+        # Tells Traefik to secure with BasicAuth
+        - "traefik.http.routers.helloworld-sec.middlewares=auth"
+        # Tells Traefik the service expose the port 80 internally.
+        - "traefik.http.services.helloworld-sec.loadbalancer.server.port=80"
         # Tells Traefik the service use tls / ssl
-        - "traefik.http.routers.helloworld.tls=true"
+        - "traefik.http.routers.helloworld-sec.tls=true"
         # Tells Traefik the certificates resolver for automatic cert generation & installation
-        - "traefik.http.routers.helloworld.tls.certresolver=le"
+        - "traefik.http.routers.helloworld-sec.tls.certresolver=le"
 networks:
   proxy:
     external: true
